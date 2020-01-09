@@ -9,7 +9,8 @@
 package auth
 
 const (
-	T_TENANT uint32 = iota
+	T_TENANT_ID uint32 = iota
+	T_CLIENT_ID
 	T_SCOPE
 )
 
