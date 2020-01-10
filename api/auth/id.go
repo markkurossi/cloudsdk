@@ -25,13 +25,13 @@ func NewID() (ID, error) {
 }
 
 func (id ID) String() string {
-	return base64.RawStdEncoding.EncodeToString(id[:])
+	return base64.RawURLEncoding.EncodeToString(id[:])
 }
 
 func ParseID(val string) (ID, error) {
 	var id ID
 
-	data, err := base64.RawStdEncoding.DecodeString(val)
+	data, err := base64.RawURLEncoding.DecodeString(val)
 	if err != nil {
 		return id, err
 	}
