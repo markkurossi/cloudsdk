@@ -19,5 +19,10 @@ const (
 )
 
 const (
+	TOKEN_VALUES tlv.Type = iota
+	TOKEN_SIGNATURE
+)
+
+const (
 	SCOPE_ADMIN tlv.Type = iota
 )
