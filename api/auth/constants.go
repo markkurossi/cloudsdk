@@ -8,12 +8,16 @@
 
 package auth
 
+import (
+	"github.com/markkurossi/go-libs/tlv"
+)
+
 const (
-	T_TENANT_ID uint32 = iota
+	T_TENANT_ID tlv.Type = iota
 	T_CLIENT_ID
 	T_SCOPE
 )
 
 const (
-	SCOPE_ADMIN uint32 = iota
+	SCOPE_ADMIN tlv.Type = iota
 )
