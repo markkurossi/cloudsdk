@@ -14,14 +14,12 @@ import (
 )
 
 const (
-	T_TENANT_ID tlv.Type = iota
-	T_CLIENT_ID
-	T_SCOPE
-)
-
-const (
 	TOKEN_VALUES tlv.Type = iota
 	TOKEN_SIGNATURE
+	T_TENANT_ID
+	T_CLIENT_ID
+	T_CREATED
+	T_SCOPE
 )
 
 const (
