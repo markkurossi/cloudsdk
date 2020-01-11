@@ -10,6 +10,7 @@ package auth
 
 import (
 	"github.com/markkurossi/go-libs/tlv"
+	"golang.org/x/crypto/ed25519"
 )
 
 const (
@@ -26,3 +27,7 @@ const (
 const (
 	SCOPE_ADMIN tlv.Type = iota
 )
+
+func VerifyToken(token []byte, pub ed25519.PublicKey) bool {
+	return false
+}
