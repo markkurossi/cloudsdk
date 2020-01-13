@@ -31,6 +31,10 @@ const (
 	KEY_TOKEN_SIGNATURE_KEY = "token-signature-key"
 )
 
+const (
+	ASSET_AUTH_PUBKEY = "auth-pubkey"
+)
+
 func VerifyToken(token []byte, pub ed25519.PublicKey) bool {
 	return false
 }
