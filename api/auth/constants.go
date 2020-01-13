@@ -26,6 +26,11 @@ const (
 	SCOPE_ADMIN tlv.Type = iota
 )
 
+const (
+	KEY_CLIENT_ID_SECRET    = "client-id-secret"
+	KEY_TOKEN_SIGNATURE_KEY = "token-signature-key"
+)
+
 func VerifyToken(token []byte, pub ed25519.PublicKey) bool {
 	return false
 }
