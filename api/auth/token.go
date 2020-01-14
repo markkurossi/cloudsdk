@@ -23,7 +23,8 @@ func VerifyToken(token []byte, pub ed25519.PublicKey) bool {
 }
 
 func Authorize(w http.ResponseWriter, r *http.Request, realm string,
-	signatureVerifier func(message, sig []byte) bool) tlv.Values {
+	signatureVerifier func(message, sig []byte) bool,
+	tenant *Tenant) tlv.Values {
 
 	auth := r.Header.Get("Authorization")
 	if len(auth) == 0 {
@@ -38,7 +39,7 @@ func Authorize(w http.ResponseWriter, r *http.Request, realm string,
 	}
 	if parts[0] != "Bearer" {
 		Error401f(w, realm, "invalid_authorization",
-			"Bearer authentication required")
+			"Bearer authorization required")
 		return nil
 	}
 	data, err := base64.RawURLEncoding.DecodeString(parts[1])
@@ -68,6 +69,16 @@ func Authorize(w http.ResponseWriter, r *http.Request, realm string,
 	}
 	if !signatureVerifier(valuesData, signature) {
 		Error401f(w, realm, "invalid_token", "Signature verification failed")
+		return nil
+	}
+
+	tenantID, ok := values[T_TENANT_ID].(string)
+	if !ok {
+		Error401f(w, realm, "invalid_token", "No tenant ID")
+		return nil
+	}
+	if tenantID != tenant.ID {
+		Error401f(w, realm, "invalid_token", "Wrong authentication tenant")
 		return nil
 	}
 
