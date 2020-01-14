@@ -319,6 +319,32 @@ func (store *ClientStore) Tenant(id string) ([]*Tenant, error) {
 	return result, nil
 }
 
+func (store *ClientStore) TenantByName(name string) ([]*Tenant, error) {
+	q := store.client.Collection("tenants").Where("name", "==", name)
+	iter := q.Documents(store.ctx)
+	defer iter.Stop()
+
+	var result []*Tenant
+
+	for {
+		doc, err := iter.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+		tenant, err := UnmarshalTenant(doc.Data())
+		if err != nil {
+			return nil, err
+		}
+
+		result = append(result, tenant)
+	}
+
+	return result, nil
+}
+
 type Asset struct {
 	Name string
 	Data []byte
