@@ -1,50 +1,50 @@
 //
-// vault.go
+// secretmanager.go
 //
 // Copyright (c) 2019 Markku Rossi
 //
 // All rights reserved.
 //
 
-package vault
+package secretmanager
 
 import (
 	"context"
 	"fmt"
 
-	secretmanager "cloud.google.com/go/secretmanager/apiv1beta1"
+	api "cloud.google.com/go/secretmanager/apiv1beta1"
 	"github.com/markkurossi/go-libs/fn"
 	secretmanagerpb "google.golang.org/genproto/googleapis/cloud/secretmanager/v1beta1"
 )
 
-type Vault struct {
+type SecretManager struct {
 	ctx       context.Context
 	projectID string
-	client    *secretmanager.Client
+	client    *api.Client
 }
 
-func NewVault() (*Vault, error) {
+func NewSecretManager() (*SecretManager, error) {
 	ctx := context.Background()
 	id, err := fn.GetProjectID()
 	if err != nil {
 		return nil, err
 	}
 
-	client, err := secretmanager.NewClient(ctx)
+	client, err := api.NewClient(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	return &Vault{
+	return &SecretManager{
 		ctx:       ctx,
 		projectID: id,
 		client:    client,
 	}, nil
 }
 
-func (vault *Vault) Create(name string, data []byte) error {
+func (sm *SecretManager) Create(name string, data []byte) error {
 	createReq := &secretmanagerpb.CreateSecretRequest{
-		Parent:   fmt.Sprintf("projects/%s", vault.projectID),
+		Parent:   fmt.Sprintf("projects/%s", sm.projectID),
 		SecretId: name,
 		Secret: &secretmanagerpb.Secret{
 			Replication: &secretmanagerpb.Replication{
@@ -55,7 +55,7 @@ func (vault *Vault) Create(name string, data []byte) error {
 		},
 	}
 
-	secret, err := vault.client.CreateSecret(vault.ctx, createReq)
+	secret, err := sm.client.CreateSecret(sm.ctx, createReq)
 	if err != nil {
 		return err
 	}
@@ -67,19 +67,19 @@ func (vault *Vault) Create(name string, data []byte) error {
 		},
 	}
 
-	_, err = vault.client.AddSecretVersion(vault.ctx, addReq)
+	_, err = sm.client.AddSecretVersion(sm.ctx, addReq)
 	return err
 }
 
-func (vault *Vault) Get(name, version string) ([]byte, error) {
+func (sm *SecretManager) Get(name, version string) ([]byte, error) {
 	if len(version) == 0 {
 		version = "latest"
 	}
 	req := &secretmanagerpb.AccessSecretVersionRequest{
 		Name: fmt.Sprintf("projects/%s/secrets/%s/versions/%s",
-			vault.projectID, name, version),
+			sm.projectID, name, version),
 	}
-	resp, err := vault.client.AccessSecretVersion(vault.ctx, req)
+	resp, err := sm.client.AccessSecretVersion(sm.ctx, req)
 	if err != nil {
 		return nil, err
 	}
