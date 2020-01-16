@@ -1,5 +1,5 @@
 //
-// secretmanager.go
+// client.go
 //
 // Copyright (c) 2019 Markku Rossi
 //
@@ -17,13 +17,13 @@ import (
 	secretmanagerpb "google.golang.org/genproto/googleapis/cloud/secretmanager/v1beta1"
 )
 
-type SecretManager struct {
-	ctx       context.Context
-	projectID string
-	client    *api.Client
+type Client struct {
+	ctx           context.Context
+	projectID     string
+	secretManager *api.Client
 }
 
-func NewSecretManager() (*SecretManager, error) {
+func NewClient() (*Client, error) {
 	ctx := context.Background()
 	id, err := fn.GetProjectID()
 	if err != nil {
@@ -35,16 +35,16 @@ func NewSecretManager() (*SecretManager, error) {
 		return nil, err
 	}
 
-	return &SecretManager{
-		ctx:       ctx,
-		projectID: id,
-		client:    client,
+	return &Client{
+		ctx:           ctx,
+		projectID:     id,
+		secretManager: client,
 	}, nil
 }
 
-func (sm *SecretManager) Create(name string, data []byte) error {
+func (client *Client) Create(name string, data []byte) error {
 	createReq := &secretmanagerpb.CreateSecretRequest{
-		Parent:   fmt.Sprintf("projects/%s", sm.projectID),
+		Parent:   fmt.Sprintf("projects/%s", client.projectID),
 		SecretId: name,
 		Secret: &secretmanagerpb.Secret{
 			Replication: &secretmanagerpb.Replication{
@@ -55,7 +55,7 @@ func (sm *SecretManager) Create(name string, data []byte) error {
 		},
 	}
 
-	secret, err := sm.client.CreateSecret(sm.ctx, createReq)
+	secret, err := client.secretManager.CreateSecret(client.ctx, createReq)
 	if err != nil {
 		return err
 	}
@@ -67,19 +67,19 @@ func (sm *SecretManager) Create(name string, data []byte) error {
 		},
 	}
 
-	_, err = sm.client.AddSecretVersion(sm.ctx, addReq)
+	_, err = client.secretManager.AddSecretVersion(client.ctx, addReq)
 	return err
 }
 
-func (sm *SecretManager) Get(name, version string) ([]byte, error) {
+func (client *Client) Get(name, version string) ([]byte, error) {
 	if len(version) == 0 {
 		version = "latest"
 	}
 	req := &secretmanagerpb.AccessSecretVersionRequest{
 		Name: fmt.Sprintf("projects/%s/secrets/%s/versions/%s",
-			sm.projectID, name, version),
+			client.projectID, name, version),
 	}
-	resp, err := sm.client.AccessSecretVersion(sm.ctx, req)
+	resp, err := client.secretManager.AccessSecretVersion(client.ctx, req)
 	if err != nil {
 		return nil, err
 	}
