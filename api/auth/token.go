@@ -9,13 +9,13 @@
 package auth
 
 import (
+	"crypto/ed25519"
 	"encoding/base64"
 	"fmt"
 	"net/http"
 	"strings"
 
 	"github.com/markkurossi/go-libs/tlv"
-	"golang.org/x/crypto/ed25519"
 )
 
 func VerifyToken(token []byte, pub ed25519.PublicKey) bool {
