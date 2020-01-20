@@ -77,7 +77,7 @@ func Authorize(w http.ResponseWriter, r *http.Request, realm string,
 		Error401f(w, realm, "invalid_token", "No tenant ID")
 		return nil
 	}
-	if tenantID != tenant.ID {
+	if tenant != nil && tenantID != tenant.ID {
 		Error401f(w, realm, "invalid_token", "Wrong authentication tenant")
 		return nil
 	}
