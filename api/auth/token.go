@@ -26,23 +26,32 @@ func Authorize(w http.ResponseWriter, r *http.Request, realm string,
 	signatureVerifier func(message, sig []byte) bool,
 	tenant *Tenant) tlv.Values {
 
+	var tokenB64 string
+
 	auth := r.Header.Get("Authorization")
-	if len(auth) == 0 {
-		Error401(w, realm)
-		return nil
+	if len(auth) > 0 {
+		parts := strings.Split(auth, " ")
+		if len(parts) != 2 {
+			Error401f(w, realm, "invalid_authorization",
+				"Invalid HTTP Authorization header")
+			return nil
+		}
+		if parts[0] != "Bearer" {
+			Error401f(w, realm, "invalid_authorization",
+				"Bearer authorization required")
+			return nil
+		}
+		tokenB64 = parts[1]
+	} else {
+		tokens, ok := r.URL.Query()["token"]
+		if ok && len(tokens) > 0 {
+			tokenB64 = tokens[0]
+		} else {
+			Error401(w, realm)
+			return nil
+		}
 	}
-	parts := strings.Split(auth, " ")
-	if len(parts) != 2 {
-		Error401f(w, realm, "invalid_authorization",
-			"Invalid HTTP Authorization header")
-		return nil
-	}
-	if parts[0] != "Bearer" {
-		Error401f(w, realm, "invalid_authorization",
-			"Bearer authorization required")
-		return nil
-	}
-	data, err := base64.RawURLEncoding.DecodeString(parts[1])
+	data, err := base64.RawURLEncoding.DecodeString(tokenB64)
 	if err != nil {
 		Error401f(w, realm, "invalid_token", "Base64 decoding failed: %s", err)
 		return nil
