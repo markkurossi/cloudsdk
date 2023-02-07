@@ -1,7 +1,7 @@
 //
 // client.go
 //
-// Copyright (c) 2019 Markku Rossi
+// Copyright (c) 2019-2023 Markku Rossi
 //
 // All rights reserved.
 //
@@ -12,9 +12,9 @@ import (
 	"context"
 	"fmt"
 
-	api "cloud.google.com/go/secretmanager/apiv1beta1"
+	api "cloud.google.com/go/secretmanager/apiv1"
 	"github.com/markkurossi/go-libs/fn"
-	secretmanagerpb "google.golang.org/genproto/googleapis/cloud/secretmanager/v1beta1"
+	secretmanagerpb "google.golang.org/genproto/googleapis/cloud/secretmanager/v1"
 )
 
 type Client struct {
